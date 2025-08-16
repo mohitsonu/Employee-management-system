@@ -30,6 +30,11 @@ public class Employee {
     @Size(max = 50)
     private String position;
 
+    @Size(max = 50)
+    private String department;
+
+    private Integer salary;
+
     public Employee() {
 
     }
@@ -39,6 +44,15 @@ public class Employee {
         this.lastName = lastName;
         this.email = email;
         this.position = position;
+    }
+
+    public Employee(String firstName, String lastName, String email, String position, String department, Integer salary) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.position = position;
+        this.department = department;
+        this.salary = salary;
     }
 
     // Getters and Setters
@@ -81,5 +95,21 @@ public class Employee {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Integer salary) {
+        this.salary = salary;
     }
 }

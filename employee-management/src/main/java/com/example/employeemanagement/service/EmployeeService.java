@@ -2,10 +2,11 @@ package com.example.employeemanagement.service;
 
 import com.example.employeemanagement.dto.EmployeeDto;
 import com.example.employeemanagement.exception.ResourceNotFoundException;
+import com.example.employeemanagement.EmployeeMapper;
 import com.example.employeemanagement.model.Employee;
 import com.example.employeemanagement.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,47 +14,47 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
 
-    public List<EmployeeDto> getAllEmployees() {
-        return employeeRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+    // @Autowired is redundant on constructors since Spring 4.3
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+        this.employeeRepository = employeeRepository;
+        this.employeeMapper = employeeMapper;
     }
 
+    @Transactional(readOnly = true)
+    public List<EmployeeDto> getAllEmployees() {
+        return employeeRepository.findAll().stream().map(employeeMapper::mapToDto).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public EmployeeDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
-        return mapToDto(employee);
+        return employeeMapper.mapToDto(employee);
     }
 
+    @Transactional
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
-        Employee employee = mapToEntity(employeeDto);
-        return mapToDto(employeeRepository.save(employee));
+        Employee employee = employeeMapper.mapToEntity(employeeDto);
+        return employeeMapper.mapToDto(employeeRepository.save(employee));
     }
 
+    @Transactional
     public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
 
-        employee.setFirstName(employeeDto.getFirstName());
-        employee.setLastName(employeeDto.getLastName());
-        employee.setEmail(employeeDto.getEmail());
-        employee.setPosition(employeeDto.getPosition());
-
-        return mapToDto(employeeRepository.save(employee));
+        employeeMapper.updateEntityFromDto(employee, employeeDto);
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToDto(updatedEmployee);
     }
 
+    @Transactional
     public void deleteEmployee(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
         employeeRepository.delete(employee);
-    }
-
-    private EmployeeDto mapToDto(Employee employee) {
-        return new EmployeeDto(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmail(), employee.getPosition());
-    }
-
-    private Employee mapToEntity(EmployeeDto employeeDto) {
-        return new Employee(employeeDto.getFirstName(), employeeDto.getLastName(), employeeDto.getEmail(), employeeDto.getPosition());
     }
 }

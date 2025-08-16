@@ -99,4 +99,8 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
+    public boolean hasRole(RoleName roleName) {
+        return roles.stream().anyMatch(role -> role.getName() == roleName);
+    }
 }

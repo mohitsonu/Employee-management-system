@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i>👥</i>
+                Employee Management System
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="userInfo" style="display: none; align-items: center; gap: 0.5rem;">
+                    <span>Welcome, <strong id="userName">Admin</strong></span>
+                </div>
+                <button id="loginBtn" class="btn btn-primary">🔐 Login</button>
+                <button id="logoutBtn" class="btn btn-secondary" style="display: none;">🚪 Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-form">
+            <button id="closeLoginBtn" class="close-btn">&times;</button>
+            <h2>🔐 Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="admin" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="admin123" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <h1>👥 Employee Management Dashboard</h1>
+                <p>Manage your team efficiently with our comprehensive employee management system</p>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalEmployees">0</div>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSalary">$0</div>
+                    <div class="stat-label">Total Salary</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgSalary">$0</div>
+                    <div class="stat-label">Average Salary</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee List Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i>📋</i>
+                    Employee List
+                </h2>
+                <button class="btn btn-primary" onclick="employeeManager.loadEmployeesPublic()">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div id="employeeList" class="employee-grid">
+                <div class="loading">Loading employees...</div>
+            </div>
+        </div>
+
+        <!-- Admin Sections (Hidden by default) -->
+        <div id="adminSections" style="display: none;">
+            <!-- Create Employee Section -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i>➕</i>
+                    Add New Employee
+                </h2>
+                <form id="createEmployeeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Position *</label>
+                            <input type="text" id="position" name="position" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="department">Department</label>
+                            <input type="text" id="department" name="department" placeholder="e.g., Engineering, Marketing, HR">
+                        </div>
+                        <div class="form-group">
+                            <label for="salary">Salary</label>
+                            <input type="number" id="salary" name="salary" min="0" placeholder="e.g., 75000">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">➕ Create Employee</button>
+                </form>
+            </div>
+
+            <!-- Update Employee Section -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i>✏️</i>
+                    Update Employee
+                </h2>
+                <form id="updateEmployeeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateId">Employee ID *</label>
+                            <input type="number" id="updateId" name="updateId" required readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateFirstName">First Name *</label>
+                            <input type="text" id="updateFirstName" name="updateFirstName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateLastName">Last Name *</label>
+                            <input type="text" id="updateLastName" name="updateLastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateEmail">Email *</label>
+                            <input type="email" id="updateEmail" name="updateEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updatePosition">Position *</label>
+                            <input type="text" id="updatePosition" name="updatePosition" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDepartment">Department</label>
+                            <input type="text" id="updateDepartment" name="updateDepartment" placeholder="e.g., Engineering, Marketing, HR">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateSalary">Salary</label>
+                            <input type="number" id="updateSalary" name="updateSalary" min="0" placeholder="e.g., 75000">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn btn-success">✏️ Update Employee</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Delete Employee Section -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <i>🗑️</i>
+                    Delete Employee
+                </h2>
+                <form id="deleteEmployeeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="deleteId">Employee ID *</label>
+                            <input type="number" id="deleteId" name="deleteId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn btn-danger">🗑️ Delete Employee</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
