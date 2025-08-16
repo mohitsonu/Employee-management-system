@@ -27,17 +27,20 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final String adminUsername;
     private final String adminPassword;
+    private final String adminEmail;
 
     public DataInitializer(RoleRepository roleRepository,
                            UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            @Value("${app.admin.username:admin}") String adminUsername,
-                           @Value("${app.admin.password:admin123}") String adminPassword) {
+                           @Value("${app.admin.password:admin123}") String adminPassword,
+                           @Value("${app.admin.email:admin@example.com}") String adminEmail) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.adminUsername = adminUsername;
         this.adminPassword = adminPassword;
+        this.adminEmail = adminEmail;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class DataInitializer implements CommandLineRunner {
                     return new User(
                             "Admin User",
                             adminUsername,
-                            adminUsername + "@example.com",
+                            adminEmail,
                             passwordEncoder.encode(adminPassword)
                     );
                 });

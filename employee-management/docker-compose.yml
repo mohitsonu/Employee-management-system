@@ -1,33 +1,33 @@
-version: '3.8'
 services:
   db:
-    image: postgres:14.1-alpine
-    restart: always
+    image: postgres:14-alpine
+    container_name: employee-db-container
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=employee_db
+      POSTGRES_DB: employee_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - '5432:5432'
+      - "5432:5432" # Expose postgres port to the host machine
     volumes:
-      - db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - postgres_data:/var/lib/postgresql/data
+
   app:
-    build: .
-    restart: on-failure
+    build: . # Build the image from the Dockerfile in the current directory
+    container_name: employee-app-container
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     ports:
-      - '8080:8080'
+      - "8082:8082" # Expose app port to the host machine
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/employee_db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      # These environment variables override the defaults in application.properties
+      - DB_URL=jdbc:postgresql://db:5432/employee_db # 'db' is the service name of the postgres container
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      # Use ':-' for default values in Docker Compose. This allows overriding via host environment variables.
+      - JWT_SECRET=${JWT_SECRET:-bXktc3VwZXItc2VjcmV0LWtleS1mb3Itand0LWF1dGhlbnRpY2F0aW9uLWlzLXZlcnktbG9uZy1hbmQtc2VjdXJl}
+      - APP_ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - APP_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - APP_ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+
 volumes:
-  db:
-    driver: local
+  postgres_data: # This ensures your database data persists across container restarts
