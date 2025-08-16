@@ -41,6 +41,8 @@ class EmployeeManager {
 
             if (action === 'edit') {
                 this.editEmployee(id);
+            } else if (action === 'delete') {
+                this.handleCardDelete(id);
             }
         });
         
@@ -245,8 +247,9 @@ class EmployeeManager {
             };
 
             const editButton = createActionButton('✏️ Edit', 'edit', emp.id, 'btn-secondary');
+            const deleteButton = createActionButton('🗑️ Delete', 'delete', emp.id, 'btn-danger');
 
-            actions.append(editButton);
+            actions.append(editButton, deleteButton);
             card.appendChild(actions);
         }
 
@@ -342,6 +345,15 @@ class EmployeeManager {
         }
     }
 
+    handleCardDelete(id) {
+        const employee = this.employees.find(emp => emp.id === id);
+        if (!employee) return;
+
+        if (confirm(`Are you sure you want to delete ${employee.firstName} ${employee.lastName}?`)) {
+            this.deleteEmployee(id);
+        }
+    }
+
     async deleteEmployee(id) {
         if (!this.authToken) return this.showStatus('Please login first!', 'error');
 
@@ -350,8 +362,6 @@ class EmployeeManager {
             this.showStatus(`Error: Employee with ID ${id} not found in the current list.`, 'error');
             return;
         }
-
-        // The confirm dialog is no longer needed here as the action is initiated from a dedicated form.
 
         try {
             const response = await fetch(`/api/employees/${id}`, {
@@ -374,7 +384,11 @@ class EmployeeManager {
         e.preventDefault();
         const idInput = document.getElementById('deleteId');
         const id = idInput.value;
-        if (id && !isNaN(id)) {
+        const employee = this.employees.find(emp => emp.id === parseInt(id, 10));
+
+        if (id && !isNaN(id) && employee) {
+            // For the form, we can also add a confirmation for safety
+            if (!confirm(`This will permanently delete ${employee.firstName} ${employee.lastName} (ID: ${id}). Are you sure?`)) return;
             await this.deleteEmployee(parseInt(id, 10));
             e.target.reset();
         } else {
